@@ -2,19 +2,18 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using HoneywellHackathon.Model;
+using HoneywellHackathon.Controllers;
 using Microsoft.ApplicationBlocks.Data;
+using Microsoft.Extensions.Logging;
 
 namespace HoneywellHackathon.Repository
 {
     public class IncidentRepository : IIncidentRepository
     {
+        //TODO: Move this and fetch the value from appsetting.json file
         private string _connectionString =
             "Data Source=(LocalDb)\\MSSQLLocalDB;Initial Catalog=Hack;Integrated Security=SSPI;";
-
+        private readonly ILogger<IncidentController> _logger;
 
         public void InsertCustomerOrderDetails(Incident incident)
         {
@@ -35,6 +34,8 @@ namespace HoneywellHackathon.Repository
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, ex.Message);
+                throw;
             }
 
             //return dsCartDetails;
@@ -70,23 +71,57 @@ namespace HoneywellHackathon.Repository
             }
             catch (Exception ex)
             {
-                return null;
+                _logger.LogError(ex, ex.Message);
+                throw;
             }
         }
 
         public void AssignTicket(AssignTicket assignTicket)
         {
-            DataSet dsCartDetails = new DataSet();
             try
             {
                 SqlParameter[] sqlparams = new SqlParameter[8];
                 sqlparams[0] = new SqlParameter("@IncidentID", assignTicket.IncidentID);
                 sqlparams[1] = new SqlParameter("@ExecutiveID", assignTicket.ExecutiveID);
-                dsCartDetails = SqlHelper.ExecuteDataset(_connectionString, CommandType.StoredProcedure,
+                SqlHelper.ExecuteDataset(_connectionString, CommandType.StoredProcedure,
                     "usp_AssignTicket", sqlparams);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, ex.Message);
+                throw;
+            }
+        }
+
+        public TicketStatus GetTicketStatus(int incidentID)
+        {
+            var ticket = new TicketStatus();
+            DataSet dsIncidents = new DataSet();
+            try
+            {
+                SqlParameter[] sqlparams = new SqlParameter[1];
+                sqlparams[0] = new SqlParameter("@IncidentID", incidentID);
+                dsIncidents = SqlHelper.ExecuteDataset(_connectionString, CommandType.StoredProcedure,
+                    "usp_GetTicketStatus");
+
+                if (dsIncidents != null && dsIncidents.Tables.Count > 0 && dsIncidents.Tables[0].Rows.Count > 0)
+                {
+                    var dt = dsIncidents.Tables[0];
+                    var row = dt.Rows[0];
+                    ticket = new TicketStatus()
+                    {
+                        IncidentID = Convert.ToInt32(row["IncidentID"].ToString()),
+                        ReporterName = row["ReporterName"].ToString(),
+                        Remark = row["Remarks"].ToString(),
+                        LastUpdated = Convert.ToDateTime(row["LastUpdated"].ToString()),
+                    };
+                }
+                return ticket;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                throw;
             }
         }
     }

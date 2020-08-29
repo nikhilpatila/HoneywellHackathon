@@ -13,5 +13,7 @@ namespace HoneywellHackathon.Repository
         List<Incident> GetAllIncidents();
 
         void AssignTicket(AssignTicket assignTicket);
+
+        TicketStatus GetTicketStatus(int incidentID);
     }
 }

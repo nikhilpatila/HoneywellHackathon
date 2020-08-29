@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Web.Http;
 using HoneywellHackathon.Model;
 using HoneywellHackathon.Repository;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Swashbuckle.Swagger;
 using Swashbuckle.Swagger.Annotations;
 
 namespace HoneywellHackathon.Controllers
@@ -50,6 +44,7 @@ namespace HoneywellHackathon.Controllers
             }
             catch (Exception e)
             {
+                _logger.LogError(e, e.Message);
                 return new ObjectResult(HttpStatusCode.InternalServerError);
             }
             
@@ -68,10 +63,10 @@ namespace HoneywellHackathon.Controllers
             }
             catch (Exception e)
             {
+                _logger.LogError(e, e.Message);
                 return new ObjectResult(HttpStatusCode.InternalServerError);
             }
         }
-
 
         [Microsoft.AspNetCore.Mvc.HttpPost]
         [Route("assign")]
@@ -90,6 +85,25 @@ namespace HoneywellHackathon.Controllers
             }
             catch (Exception e)
             {
+                _logger.LogError(e, e.Message);
+                return new ObjectResult(HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [Microsoft.AspNetCore.Mvc.HttpGet]
+        [Route("status")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(TicketStatusViewModel))]
+        public IActionResult GetTicketStatus(int incidentID)
+        {
+            var rng = new Random();
+            try
+            {
+                var result = _incidentRepository.GetTicketStatus(incidentID);
+                return new ObjectResult(result);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
                 return new ObjectResult(HttpStatusCode.InternalServerError);
             }
         }
