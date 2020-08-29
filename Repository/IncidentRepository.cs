@@ -102,7 +102,7 @@ namespace HoneywellHackathon.Repository
                 SqlParameter[] sqlparams = new SqlParameter[1];
                 sqlparams[0] = new SqlParameter("@IncidentID", incidentID);
                 dsIncidents = SqlHelper.ExecuteDataset(_connectionString, CommandType.StoredProcedure,
-                    "usp_GetTicketStatus");
+                    "usp_GetTicketStatus", sqlparams);
 
                 if (dsIncidents != null && dsIncidents.Tables.Count > 0 && dsIncidents.Tables[0].Rows.Count > 0)
                 {
@@ -111,9 +111,9 @@ namespace HoneywellHackathon.Repository
                     ticket = new TicketStatus()
                     {
                         IncidentID = Convert.ToInt32(row["IncidentID"].ToString()),
-                        ReporterName = row["ReporterName"].ToString(),
+                        ReporterName = row["ExecutiveName"].ToString(),
                         Remark = row["Remarks"].ToString(),
-                        LastUpdated = Convert.ToDateTime(row["LastUpdated"].ToString()),
+                        LastUpdated = Convert.ToDateTime(row["ClosureDate"].ToString()),
                     };
                 }
                 return ticket;

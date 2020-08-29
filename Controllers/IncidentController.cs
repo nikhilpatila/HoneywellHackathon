@@ -8,6 +8,10 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace HoneywellHackathon.Controllers
 {
+    //TODO : Add unit tests
+    //TODO : Move logic to service layers
+    //TODO : Add custom response messages
+    //TODO : Verify edge case scenarios
     [ApiController]
     [Route("[controller]")]
     public class IncidentController : Controller
@@ -22,6 +26,11 @@ namespace HoneywellHackathon.Controllers
             _incidentRepository = incidentRepository;
         }
 
+        /// <summary>
+        /// API to add Incidents on vehicles part of the zone
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [Microsoft.AspNetCore.Mvc.HttpPost]
         [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(IncidentRequestViewModel))]
         public IActionResult AddIncident(IncidentRequestViewModel request)
@@ -50,6 +59,10 @@ namespace HoneywellHackathon.Controllers
             
         }
 
+        /// <summary>
+        /// API to get all active incidents pertaining to zonal vehicles
+        /// </summary>
+        /// <returns></returns>
         [Microsoft.AspNetCore.Mvc.HttpGet]
         [Route("getall")]
         [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(IncidentsViewModel))]
@@ -68,6 +81,11 @@ namespace HoneywellHackathon.Controllers
             }
         }
 
+        /// <summary>
+        /// API to assign open tickets to a Support Executive
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [Microsoft.AspNetCore.Mvc.HttpPost]
         [Route("assign")]
         [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(AssignTicketViewModel))]
@@ -90,15 +108,20 @@ namespace HoneywellHackathon.Controllers
             }
         }
 
+        /// <remarks>
+        /// API to fetch details about the ticket
+        /// </remarks>
+        /// <param name="incidentID"></param>
+        /// <returns></returns>
         [Microsoft.AspNetCore.Mvc.HttpGet]
-        [Route("status")]
+        [Route("status/{id}")]
         [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(TicketStatusViewModel))]
-        public IActionResult GetTicketStatus(int incidentID)
+        public IActionResult GetTicketStatus(string id)
         {
             var rng = new Random();
             try
             {
-                var result = _incidentRepository.GetTicketStatus(incidentID);
+                var result = _incidentRepository.GetTicketStatus(Convert.ToInt32(id));
                 return new ObjectResult(result);
             }
             catch (Exception e)
