@@ -9,6 +9,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace HoneywellHackathon.Controllers
 {
     //TODO : Add unit tests
+    //TODO : Add authentication, authorization
     //TODO : Move logic to service layers
     //TODO : Add custom response messages
     //TODO : Verify edge case scenarios
